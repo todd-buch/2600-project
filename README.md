@@ -4,29 +4,28 @@ As a group we decided to make models that would analyze and predict if someone w
 ### Dataset: `https://www.kaggle.com/c/home-credit-default-risk`
 
 ## Features to be used
-
 - `AMT_INCOME_TOTAL`
   - Income the client has to make the payments.
 - `AMT_CREDIT`
   - Size of this loan.
-- `AMT_ANNUITY`
-  - Scheduled payment, so we can see the burden against income.
+- `ANNUITY_TO_INCOME`
+  - Annuity divided by income. The raw annuity moved almost in lockstep with the loan size.
 - `NAME_CONTRACT_TYPE`
   - Cash loans and revolving loans are paid back on different terms.
 - `DAYS_BIRTH`
   - Age at application. Stored as days before the application, so we flip the sign.
 - `CODE_GENDER`
-  - Recorded on every application, and default rates differ by it.
+  - Recorded on every application, and default rates differ by it. The 4 rows coded `XNA` are dropped.
 - `NAME_FAMILY_STATUS`
-  - Married, single, and the other statuses split the household differently.
+  - Married, single, and the other statuses split the household differently. The 2 rows coded `Unknown` are dropped.
 - `CNT_CHILDREN`
   - Dependents already claim part of the income.
 - `NAME_INCOME_TYPE`
-  - Working, pension, and the rarer types are not the same kind of income.
-- `OCCUPATION_TYPE`
-  - Job category. 31% missing, which we keep as its own level.
+  - Working, pension, commercial associate, and state servant. Unemployed, student, businessman, and maternity leave are folded into `Other`.
 - `DAYS_EMPLOYED`
-  - Time in the current job. A sentinel value (365243) marks people who are not employed, mostly pensioners.
+  - Time in the current job, with the sign flipped so it counts days employed.
+- `NOT_EMPLOYED`
+  - The value 365243 in `DAYS_EMPLOYED` marks people who are not employed, mostly pensioners. Those rows get a 1 here and a 0 in `DAYS_EMPLOYED`.
 - `NAME_EDUCATION_TYPE`
   - Highest schooling, filled in for every application.
 - `FLAG_OWN_CAR`
@@ -35,13 +34,17 @@ As a group we decided to make models that would analyze and predict if someone w
   - Owns a house or flat. This is only the yes/no flag, not building attributes.
 - `EXT_SOURCE_2` and `EXT_SOURCE_3`
   - Outside risk scores. `EXT_SOURCE_2` is nearly complete and `EXT_SOURCE_3` is missing on about 20% of rows. We leave out `EXT_SOURCE_1` because it is missing on more than half of applications.
-- Bureau `CREDIT_ACTIVE`, `CREDIT_DAY_OVERDUE`, and `AMT_CREDIT_SUM_OVERDUE`
-  - Past-due and still-open credit bureau loans are direct payment trouble.
-- Bureau `AMT_CREDIT_SUM` and `AMT_CREDIT_SUM_DEBT`
-  - How much outside credit and debt the client already has. Debt is missing on 15% of bureau rows.
-- Previous `NAME_CONTRACT_STATUS`
-  - How many earlier Home Credit applications were approved, refused, canceled, or left as an unused offer.
-- Previous `AMT_APPLICATION` and `AMT_CREDIT`
-  - What the client asked for on earlier loans versus what was actually granted.
+- `BUREAU_N_ACTIVE`
+  - How many credit-bureau loans are still open.
+- `BUREAU_DAYS_OVERDUE`
+  - Longest current bureau delinquency, in days.
+- `BUREAU_AMT_OVERDUE`
+  - Total amount currently overdue at the credit bureau.
+- `BUREAU_AMT_DEBT`
+  - Total bureau debt. We skip the bureau credit sum because it tracks this debt.
+- `PREV_N_REFUSED`
+  - How many earlier Home Credit applications were refused.
+- `PREV_AMT_GAP`
+  - On earlier loans, the amount asked minus the amount granted. The two raw sums were almost the same number.
 
 ## Run instructions
